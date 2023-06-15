@@ -7,15 +7,14 @@ export type Body = {
   url: string;
 };
 
-export type List = {
-  keys: {
-    name: string;
-    expiration?: number;
-    metadata: { url: string };
-  }[];
-  list_complete: boolean;
-  cursor: string;
+export type ListMetadata = {
+  metadata: { url: string };
 };
+
+export type ListData = {
+  publickey: string
+  url: string
+}[];
 
 const headers = {
   'Access-Control-Allow-Origin': '*',
@@ -28,24 +27,44 @@ export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     try {
       switch (request.method) {
-        case 'GET':
-          const value = await env.dapp_course.list<List>();
-          let arrayOfKeys = {};
-          for (const v of value.keys) {
-            arrayOfKeys[v.name] = v.metadata.url;
+        case 'GET': {
+          const list = await env.dapp_course.list<{ url: string }>();
+          const data: ListData = [];
+
+          for (const key of list.keys) {
+            if (!key.metadata?.url)
+              continue;
+
+            data.push({
+              publickey: key.name,
+              url: key.metadata.url
+            });
           }
-          return Response.json(arrayOfKeys, { headers });
 
-        case 'POST':
+          return Response.json(data, { headers });
+        }
+
+        case 'POST': {
           const body: Body = await request.json(); // Parse the request body as JSON
-          await env.dapp_course.put(body.publickey, body.url, { metadata: { url: body.url } });
-          return new Response('url updated', { status: 200, headers });
 
-        default:
+          if (!body.publickey)
+            return new Response('Missing publickey!', { status: 422, headers });
+
+          if (!body.url)
+            return new Response('Missing url!', { status: 422, headers });
+
+          await env.dapp_course.put(body.publickey, body.url, { metadata: { url: body.url } });
+
+          return new Response(null, { status: 204, headers });
+        }
+
+        default: {
           return new Response(null, { status: 404, headers });
+        }
       }
-    } catch (e) {
-      return new Response(e.stack, { status: 500, headers });
+    } catch (err) {
+      console.error(err)
+      return new Response((err as Error)?.stack ?? null, { status: 500, headers });
     }
   },
 };
