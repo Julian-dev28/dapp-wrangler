@@ -27,6 +27,10 @@ export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     try {
       switch (request.method) {
+        case 'OPTIONS': {
+          return new Response(null, { status: 204, headers });
+        }
+
         case 'GET': {
           const list = await env.dapp_course.list<{ url: string }>();
           const data: ListData = [];
