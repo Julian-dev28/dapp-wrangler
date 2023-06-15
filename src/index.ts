@@ -10,7 +10,7 @@ export type Body = {
 
 export type ListData = {
   publickey: string;
-  url: string;
+  url: string[];
   completed: number[];
 }[];
 
@@ -41,8 +41,8 @@ export default {
 
             data.push({
               publickey: key.name,
-              url: key.metadata.url,
-              completed: key.metadata.completed ?? false,
+              url: Array.from(key.metadata.url),
+              completed: key.metadata.completed ?? [],
             });
           }
 
@@ -63,8 +63,13 @@ export default {
             const existingMetadata = existingCourse?.metadata as ListMetadata['metadata'] | undefined;
             const existingCompletedCourses = existingMetadata?.completed || [];
 
+            const existingUrl = existingMetadata?.url || [];
+            const uniqueUrl = Array.from(new Set([existingUrl, body.url]));
+
+            const clearUrl = Array.from(new Set(['', '']));
+
             const uniqueCompletedCourses = Array.from(new Set([...existingCompletedCourses, ...body.completed]));
-            await env.dapp_course.put(body.publickey, body.url, { metadata: { url: body.url, completed: uniqueCompletedCourses } });
+            await env.dapp_course.put(body.publickey, body.url, { metadata: { url: uniqueUrl, completed: uniqueCompletedCourses } });
 
             return new Response('Profile Updated', { status: 200, headers });
           } catch (err) {
