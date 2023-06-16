@@ -63,10 +63,11 @@ export default {
             const existingMetadata = existingCourse?.metadata as ListMetadata['metadata'] | undefined;
             const existingCompletedCourses = existingMetadata?.completed || [];
 
-            const existingUrl = existingMetadata?.url || [];
-            const uniqueUrl = Array.from(new Set([existingUrl, body.url]));
-
-            const clearUrl = Array.from(new Set(['', '']));
+            const existingUrl = (existingMetadata?.url || []) as string[];
+            if (!existingUrl.includes(body.url)) {
+              existingUrl.push(body.url);
+            }
+            const uniqueUrl = Array.from(new Set(existingUrl));
 
             const uniqueCompletedCourses = Array.from(new Set([...existingCompletedCourses, ...body.completed]));
             await env.dapp_course.put(body.publickey, body.url, { metadata: { url: uniqueUrl, completed: uniqueCompletedCourses } });
