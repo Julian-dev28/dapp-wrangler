@@ -77,24 +77,6 @@ export default {
             console.error(err);
             return new Response((err as Error)?.stack ?? null, { status: 500, headers });
           }
-
-          // const list = await env.dapp_course.list<{ url: string; completed: number[] }>();
-          // const data: ListData = [];
-
-          // for (const key of list.keys) {
-          //   if (!key.metadata?.url) continue;
-
-          //   data.push({
-          //     publickey: key.name,
-          //     url: key.metadata.url,
-          //     completed: key.metadata.completed ?? false,
-          //   });
-          //   let existingCompletedCourses = key.metadata?.completed ?? [];
-          //   let newCompletedCourses = [...existingCompletedCourses, ...body.completed];
-          //   await env.dapp_course.put(body.publickey, body.url, { metadata: { url: body.url, completed: newCompletedCourses } });
-
-          //   return new Response(null, { status: 204, headers });
-          // }
         }
 
         default: {
