@@ -61,19 +61,6 @@ export default {
 
             if (!body.course_index) return new Response('Missing course index!', { status: 422, headers });
 
-            // if (!body.completed_at) return new Response('Missing completed_at!', { status: 422, headers });
-
-            // const existingCourse = await env.dapp_course.getWithMetadata(body.publickey);
-            // const existingMetadata = existingCourse?.metadata as ListMetadata['metadata'] | undefined;
-            // const existingCompletedCourses = existingMetadata?.completed || [];
-
-            // const existingUrl = (existingMetadata?.url || []) as string[];
-            // if (!existingUrl.includes(body.url)) {
-            //   existingUrl.push(body.url);
-            // }
-            // const uniqueUrl = Array.from(new Set(existingUrl));
-
-            // const uniqueCompletedCourses = Array.from(new Set([...existingCompletedCourses, ...body.completed]));
             await env.dapp_course.put(`${body.publickey}:${body.course_index}`, body.url, { metadata: { url: body.url } });
 
             return new Response('Profile Updated', { status: 200, headers });
