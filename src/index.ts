@@ -6,16 +6,17 @@ export type Body = {
   publickey: string;
   url: string;
   course_index: number;
+  // completed_at: number;
 };
 
 export type ListData = {
   publickey: string;
-  url: string[];
-  completed: number[];
+  url: string;
+  // completed_at: number;
 }[];
 
 export type ListMetadata = {
-  metadata: { url: string; completed: number[] };
+  metadata: { url: string; };
 };
 const headers = {
   'Access-Control-Allow-Origin': '*',
@@ -33,7 +34,7 @@ export default {
         }
 
         case 'GET': {
-          const list = await env.dapp_course.list<{ url: string; completed: number[] }>();
+          const list = await env.dapp_course.list<{ url: string; }>();
           const data: ListData = [];
 
           for (const key of list.keys) {
@@ -41,8 +42,9 @@ export default {
 
             data.push({
               publickey: key.name,
-              url: Array.from(key.metadata.url),
-              completed: key.metadata.completed ?? [],
+              url: key.metadata.url,
+              // completed_at: key.metadata.completed_at,
+              // completed: key.metadata.completed ?? [],
             });
           }
 
@@ -58,6 +60,8 @@ export default {
             if (!body.url) return new Response('Missing url!', { status: 422, headers });
 
             if (!body.course_index) return new Response('Missing course index!', { status: 422, headers });
+
+            // if (!body.completed_at) return new Response('Missing completed_at!', { status: 422, headers });
 
             // const existingCourse = await env.dapp_course.getWithMetadata(body.publickey);
             // const existingMetadata = existingCourse?.metadata as ListMetadata['metadata'] | undefined;
